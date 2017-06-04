@@ -151,6 +151,18 @@ UMP_API_EXPORT void* ump_phys_address_get(ump_handle memh)
 	return mem->phys_address;
 }
 
+UMP_API_EXPORT void* ump_bus_address_get(ump_handle memh)
+{
+        ump_mem * mem = (ump_mem*)memh;
+
+        UMP_DEBUG_ASSERT(UMP_INVALID_MEMORY_HANDLE != memh, ("Handle is invalid"));
+        UMP_DEBUG_ASSERT(UMP_INVALID_SECURE_ID != mem->secure_id, ("Secure ID is inavlid"));
+        UMP_DEBUG_ASSERT(0 < mem->ref_count, ("Reference count too low"));
+        UMP_DEBUG_ASSERT(0 < mem->size, ("Memory size of passed handle too low"));
+
+        return mem->bus_address;
+}
+
 UMP_API_EXPORT void* ump_mapped_pointer_get(ump_handle memh)
 {
 	ump_mem * mem = (ump_mem*)memh;

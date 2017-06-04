@@ -153,6 +153,7 @@ static ump_handle ump_ref_drv_allocate_internal(unsigned long size, ump_alloc_co
 				mem->cookie = cookie;
 				mem->is_cached = 1; /* Default to ON, is disabled later if not */
 				mem->phys_address = ump_arch_phys_address(secure_id);
+				mem->bus_address = ump_arch_bus_address(secure_id);
 
 				_ump_osu_lock_auto_init(&mem->ref_lock, 0, 0, 0);
 				UMP_DEBUG_ASSERT(NULL != mem->ref_lock, ("Failed to initialize lock\n"));

@@ -188,6 +188,7 @@ void *ump_arch_phys_address(ump_secure_id secure_id)
 	dd_phys_addr_call_arg.ctx = ump_uk_ctx;
 	dd_phys_addr_call_arg.secure_id = secure_id;
 	dd_phys_addr_call_arg.phys_addr = 0;
+	dd_phys_addr_call_arg.bus_addr = 0;
 
 	if (_UMP_OSU_ERR_OK == _ump_uku_phys_addr_get( &dd_phys_addr_call_arg ) )
 	{
@@ -195,6 +196,23 @@ void *ump_arch_phys_address(ump_secure_id secure_id)
 	}
 
 	return 0;	
+}
+
+void *ump_arch_bus_address(ump_secure_id secure_id)
+{
+        _ump_uk_phys_addr_get_s dd_phys_addr_call_arg;
+
+        dd_phys_addr_call_arg.ctx = ump_uk_ctx;
+        dd_phys_addr_call_arg.secure_id = secure_id;
+        dd_phys_addr_call_arg.phys_addr = 0;
+        dd_phys_addr_call_arg.bus_addr = 0;
+
+        if (_UMP_OSU_ERR_OK == _ump_uku_phys_addr_get( &dd_phys_addr_call_arg ) )
+        {
+                return dd_phys_addr_call_arg.bus_addr;
+        }
+
+        return 0;
 }
 
 void ump_arch_reference_release(ump_secure_id secure_id)

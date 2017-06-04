@@ -52,6 +52,7 @@ typedef struct ump_mem
 	unsigned long cookie;          /**< cookie for use in arch_unmap calls */
 	ump_cache_enabled is_cached;
 	void *phys_address;
+	void *bus_address;
 } ump_mem;
 
 #ifdef __cplusplus
