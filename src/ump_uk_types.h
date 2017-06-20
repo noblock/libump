@@ -1,17 +1,11 @@
 /*
- * Copyright (C) 2010, 2012 ARM Limited. All rights reserved.
+ * Copyright (C) 2010, 2012-2014, 2016 ARM Limited. All rights reserved.
  * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software and is provided to you under the terms of the GNU General Public License version 2
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
  * 
- *       http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * A copy of the licence is included with the program, and can also be obtained from Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 /**
@@ -23,8 +17,7 @@
 #define __UMP_UK_TYPES_H__
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /* Helpers for API version handling */
@@ -40,7 +33,7 @@ extern "C"
  * The 16bit integer is stored twice in a 32bit integer
  * So for version 1 the value would be 0x00010001
  */
-#define UMP_IOCTL_API_VERSION MAKE_VERSION_ID(2)
+#define UMP_IOCTL_API_VERSION MAKE_VERSION_ID(3)
 
 typedef enum
 {
@@ -51,14 +44,13 @@ typedef enum
 	_UMP_IOC_MAP_MEM,    /* not used in Linux */
 	_UMP_IOC_UNMAP_MEM,  /* not used in Linux */
 	_UMP_IOC_MSYNC,
-#if UNIFIED_MEMORY_PROVIDER_VERSION > 2
 	_UMP_IOC_CACHE_OPERATIONS_CONTROL,
 	_UMP_IOC_SWITCH_HW_USAGE,
 	_UMP_IOC_LOCK,
 	_UMP_IOC_UNLOCK,
 	_UMP_IOC_PHYS_ADDR_GET,
-#endif /* UNIFIED_MEMORY_PROVIDER_VERSION */
-}_ump_uk_functions;
+	_UMP_IOC_DMABUF_IMPORT,
+} _ump_uk_functions;
 
 typedef enum
 {
@@ -71,14 +63,11 @@ typedef enum
 {
 	_UMP_UK_MSYNC_CLEAN = 0,
 	_UMP_UK_MSYNC_CLEAN_AND_INVALIDATE = 1,
-#if UNIFIED_MEMORY_PROVIDER_VERSION > 2
 	_UMP_UK_MSYNC_INVALIDATE = 2,
 	_UMP_UK_MSYNC_FLUSH_L1   = 3,
-#endif /* UNIFIED_MEMORY_PROVIDER_VERSION */
 	_UMP_UK_MSYNC_READOUT_CACHE_ENABLED = 128,
 } ump_uk_msync_op;
 
-#if UNIFIED_MEMORY_PROVIDER_VERSION > 2
 typedef enum
 {
 	_UMP_UK_CACHE_OP_START = 0,
@@ -95,9 +84,8 @@ typedef enum
 {
 	_UMP_UK_USED_BY_CPU = 0,
 	_UMP_UK_USED_BY_MALI = 1,
-	_UMP_UK_USED_BY_UNKNOWN_DEVICE= 100,
+	_UMP_UK_USED_BY_UNKNOWN_DEVICE = 100,
 } ump_uk_user;
-#endif /* UNIFIED_MEMORY_PROVIDER_VERSION */
 
 /**
  * Get API version ([in,out] u32 api_version, [out] u32 compatible)
@@ -146,7 +134,7 @@ typedef struct _ump_uk_map_mem_s
 	void *phys_addr;                /**< [in] physical address */
 	unsigned long size;             /**< [in] size */
 	u32 secure_id;                  /**< [in] secure_id to assign to mapping */
-	void * _ukk_private;            /**< Only used inside linux port between kernel frontend and common part to store vma */
+	void *_ukk_private;             /**< Only used inside linux port between kernel frontend and common part to store vma */
 	u32 cookie;
 	u32 is_cached;            /**< [in,out] caching of CPU mappings */
 } _ump_uk_map_mem_s;
@@ -156,7 +144,7 @@ typedef struct _ump_uk_unmap_mem_s
 	void *ctx;            /**< [in,out] user-kernel context (trashed on output) */
 	void *mapping;
 	u32 size;
-	void * _ukk_private;
+	void *_ukk_private;
 	u32 cookie;
 } _ump_uk_unmap_mem_s;
 
@@ -172,7 +160,6 @@ typedef struct _ump_uk_msync_s
 	u32 is_cached;        /**< [out] caching of CPU mappings */
 } _ump_uk_msync_s;
 
-#if UNIFIED_MEMORY_PROVIDER_VERSION > 2
 typedef struct _ump_uk_cache_operations_control_s
 {
 	void *ctx;                   /**< [in,out] user-kernel context (trashed on output) */
@@ -200,7 +187,14 @@ typedef struct _ump_uk_unlock_s
 	void *ctx;            /**< [in,out] user-kernel context (trashed on output) */
 	u32 secure_id;        /**< [in] secure_id that identifies the ump buffer */
 } _ump_uk_unlock_s;
-#endif /* UNIFIED_MEMORY_PROVIDER_VERSION */
+
+typedef struct _ump_uk_dmabuf_s
+{
+	void *ctx;            /**< [in,out] user-kernel context (trashed on output) */
+	int fd;               /**< [in] dmabuf_fd that identifies the dmabuf buffer */
+	size_t size;          /**< [in] size of the buffer */
+	u32 secure_id;        /**< [out] secure_id that identifies the ump buffer */
+} _ump_uk_dmabuf_s;
 
 /**
  * PHYS_ADDR_GET ([in] u32 secure_id, [out]phys_addr, [out]bus_addr )

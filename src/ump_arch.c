@@ -25,7 +25,7 @@
 #include "ump_debug.h"
 
 #include "ump_uk_types.h"
-#include "ump_uku.h"
+#include "ump_ukk.h"
 
 /** Pointer to an OS-Specific context that we should pass in _uku_ calls */
 void *ump_uk_ctx = NULL;
@@ -64,7 +64,7 @@ ump_result ump_arch_open(void)
 	{
 		/* We are the first, open the UMP device driver */
 
-		if (_UMP_OSU_ERR_OK != _ump_uku_open( &ump_uk_ctx ))
+		if (_UMP_OSU_ERR_OK != _ump_ukk_open( &ump_uk_ctx ))
 		{
 			UMP_DEBUG_PRINT(1, ("UMP: ump_arch_open() failed to open UMP device driver\n"));
 			retval = UMP_ERROR;
@@ -104,7 +104,7 @@ void ump_arch_close(void)
 		ump_ref_count--;
 		if (0 == ump_ref_count)
 		{
-			_ump_osu_errcode_t retval = _ump_uku_close(&ump_uk_ctx);
+			_ump_osu_errcode_t retval = _ump_ukk_close(&ump_uk_ctx);
 			UMP_DEBUG_ASSERT(retval == _UMP_OSU_ERR_OK, ("UMP: Failed to close UMP interface"));
 			UMP_IGNORE(retval);
 			ump_uk_ctx = NULL;
@@ -151,7 +151,7 @@ ump_secure_id ump_arch_allocate(unsigned long * size, ump_alloc_constraints cons
 #endif
 	call_arg.constraints = (ump_uk_alloc_constraints)constraints;
 
-	if ( _UMP_OSU_ERR_OK != _ump_uku_allocate(&call_arg) )
+	if ( _UMP_OSU_ERR_OK != _ump_ukk_allocate(&call_arg) )
 	{
 		return UMP_INVALID_SECURE_ID;
 	}
@@ -173,7 +173,7 @@ unsigned long ump_arch_size_get(ump_secure_id secure_id)
 	dd_size_call_arg.secure_id = secure_id;
 	dd_size_call_arg.size = 0;
 
-	if (_UMP_OSU_ERR_OK == _ump_uku_size_get( &dd_size_call_arg ) )
+	if (_UMP_OSU_ERR_OK == _ump_ukk_size_get( &dd_size_call_arg ) )
 	{
 		return dd_size_call_arg.size;
 	}
@@ -190,12 +190,12 @@ void *ump_arch_phys_address(ump_secure_id secure_id)
 	dd_phys_addr_call_arg.phys_addr = 0;
 	dd_phys_addr_call_arg.bus_addr = 0;
 
-	if (_UMP_OSU_ERR_OK == _ump_uku_phys_addr_get( &dd_phys_addr_call_arg ) )
+	if (_UMP_OSU_ERR_OK == _ump_ukk_phys_addr_get( &dd_phys_addr_call_arg ) )
 	{
 		return dd_phys_addr_call_arg.phys_addr;
 	}
 
-	return 0;	
+	return 0;
 }
 
 void *ump_arch_bus_address(ump_secure_id secure_id)
@@ -207,7 +207,7 @@ void *ump_arch_bus_address(ump_secure_id secure_id)
         dd_phys_addr_call_arg.phys_addr = 0;
         dd_phys_addr_call_arg.bus_addr = 0;
 
-        if (_UMP_OSU_ERR_OK == _ump_uku_phys_addr_get( &dd_phys_addr_call_arg ) )
+        if (_UMP_OSU_ERR_OK == _ump_ukk_phys_addr_get( &dd_phys_addr_call_arg ) )
         {
                 return dd_phys_addr_call_arg.bus_addr;
         }
@@ -225,7 +225,7 @@ void ump_arch_reference_release(ump_secure_id secure_id)
 
 	UMP_DEBUG_PRINT(4, ("UMP: Releasing ID %u", secure_id));
 
-	retval = _ump_uku_release( &dd_release_call_arg );
+	retval = _ump_ukk_release( &dd_release_call_arg );
 	UMP_DEBUG_ASSERT(retval == _UMP_OSU_ERR_OK, ("UMP: Failed to release reference to UMP memory"));
 	UMP_IGNORE(retval);
 }
@@ -242,7 +242,7 @@ void* ump_arch_map(ump_secure_id secure_id, unsigned long size, ump_cache_enable
 	dd_map_call_arg.size = size;
 	dd_map_call_arg.is_cached = (u32) (UMP_CACHE_ENABLE==cache);
 
-	if ( -1 == _ump_uku_map_mem( &dd_map_call_arg ) )
+	if ( -1 == _ump_ukk_map_mem( &dd_map_call_arg ) )
 	{
 		UMP_DEBUG_PRINT(4, ("UMP: Mapping failed for ID %u", secure_id));
 		return NULL;
@@ -266,7 +266,7 @@ void ump_arch_unmap(void* mapping, unsigned long size, unsigned long cookie)
 	dd_unmap_call_arg.cookie = cookie;
 
 	UMP_DEBUG_PRINT(4, ("Unmapping 0x%08lx", (unsigned long)mapping));
-	_ump_uku_unmap_mem( &dd_unmap_call_arg );
+	_ump_ukk_unmap_mem( &dd_unmap_call_arg );
 }
 
 /** Memory synchronization - cache flushing of mapped memory */
@@ -284,7 +284,7 @@ int ump_arch_msync(ump_secure_id secure_id, void* mapping, unsigned long cookie,
 	dd_msync_call_arg.is_cached = 0;
 
 	UMP_DEBUG_PRINT(4, ("Msync 0x%08lx", (unsigned long)mapping));
-	_ump_uku_msynch( &dd_msync_call_arg );
+	_ump_ukk_msynch( &dd_msync_call_arg );
 	if ( 0==dd_msync_call_arg.is_cached )
 	{
 		UMP_DEBUG_PRINT(4, ("Trying to flush uncached UMP mem ID: %d", secure_id));
@@ -303,7 +303,7 @@ int ump_arch_cache_operations_control(ump_cache_op_control op)
 	dd_cache_control_arg.ctx = ump_uk_ctx;
 
 	UMP_DEBUG_PRINT(4, ("Cache control op:%d",(u32)op ));
-	_ump_uku_cache_operations_control( &dd_cache_control_arg );
+	_ump_ukk_cache_operations_control( &dd_cache_control_arg );
 	return 1; /* Always success */
 }
 
@@ -316,7 +316,7 @@ int ump_arch_switch_hw_usage( ump_secure_id secure_id, ump_hw_usage new_user )
 	dd_sitch_user_arg.ctx = ump_uk_ctx;
 
 	UMP_DEBUG_PRINT(4, ("Switch user UMP:%d User:%d",secure_id, (u32)new_user ));
-	_ump_uku_switch_hw_usage( &dd_sitch_user_arg );
+	_ump_ukk_switch_hw_usage( &dd_sitch_user_arg );
 	return 1; /* Always success */
 }
 
@@ -329,7 +329,7 @@ int ump_arch_lock( ump_secure_id secure_id, ump_lock_usage lock_usage )
 	dd_lock_arg.lock_usage = (ump_uk_lock_usage) lock_usage;
 
 	UMP_DEBUG_PRINT(4, ("Lock UMP:%d ",secure_id));
-	_ump_uku_lock( &dd_lock_arg );
+	_ump_ukk_lock( &dd_lock_arg );
 	return 1; /* Always success */
 }
 
@@ -341,7 +341,24 @@ int ump_arch_unlock( ump_secure_id secure_id )
 	dd_unlock_arg.secure_id = secure_id;
 
 	UMP_DEBUG_PRINT(4, ("Lock UMP:%d ",secure_id));
-	_ump_uku_unlock( &dd_unlock_arg );
+	_ump_ukk_unlock( &dd_unlock_arg );
 	return 1; /* Always success */
+}
+
+u32 ump_arch_dmabuf(int fd, size_t size)
+{
+	_ump_uk_dmabuf_s dd_dmabuf_call_arg;
+
+	dd_dmabuf_call_arg.ctx = ump_uk_ctx;
+	dd_dmabuf_call_arg.secure_id = 0;
+	dd_dmabuf_call_arg.fd = fd;
+	dd_dmabuf_call_arg.size = size;
+
+	if (_UMP_OSU_ERR_OK == _ump_ukk_dmabuf_import( &dd_dmabuf_call_arg ) )
+	{
+		return dd_dmabuf_call_arg.secure_id;
+	}
+
+	return 0;
 }
 #endif /* UNIFIED_MEMORY_PROVIDER_VERSION */

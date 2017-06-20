@@ -23,6 +23,7 @@
 #ifndef _UNIFIED_MEMORY_PROVIDER_ARCH_H_
 #define _UNIFIED_MEMORY_PROVIDER_ARCH_H_
 
+#include <stdlib.h>
 #include "ump.h"
 #include "ump_ref_drv.h"
 #include "ump_internal.h"
@@ -46,7 +47,8 @@ ump_secure_id ump_arch_allocate(unsigned long * size, ump_alloc_constraints cons
 unsigned long ump_arch_size_get(ump_secure_id secure_id);
 
 /** Query physical address of specified UMP memory. */
-void* ump_arch_phys_address_get(ump_secure_id secure_id);
+void* ump_arch_phys_address(ump_secure_id secure_id);
+void *ump_arch_bus_address(ump_secure_id secure_id);
 
 /** Release a reference from specified UMP memory. */
 void ump_arch_reference_release(ump_secure_id secure_id);
@@ -75,6 +77,9 @@ int ump_arch_lock( ump_secure_id secure_id, ump_lock_usage lock_usage );
 /** Unlocking buffer. Let other users lock the buffer for their usage */
 int ump_arch_unlock( ump_secure_id secure_id );
 #endif /* UNIFIED_MEMORY_PROVIDER_VERSION */
+
+/** Query physical address of specified UMP memory. */
+u32 ump_arch_dmabuf(int fd, size_t size);
 
 #ifdef __cplusplus
 }
