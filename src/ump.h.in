@@ -257,6 +257,7 @@ UMP_API_EXPORT void ump_reference_add(ump_handle mem);
  */
 UMP_API_EXPORT void ump_reference_release(ump_handle mem);
 
+UMP_API_EXPORT void* ump_phys_address_get(ump_handle memh);
 
 #ifdef __cplusplus
 }
